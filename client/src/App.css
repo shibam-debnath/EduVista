@@ -1,0 +1,12 @@
+#root {
+  text-align: center;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.pdf-reader{
+  padding: 0px 20px;
+}
+

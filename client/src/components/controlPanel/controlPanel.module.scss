@@ -1,0 +1,21 @@
+/* ControlPanel.module.scss */
+.control-panel {
+    margin: 1rem;
+    padding: 1rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  
+  .d-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  
+  .input {
+    padding: 0;
+    padding-left: 0.25rem;
+    margin: 0.5rem;
+  }
+  
