@@ -3,6 +3,7 @@ import styles from './home.module.scss'
 // Sectionsimport TopNavbar from "../../components/TopNavBar/TopNavBar";
 import Navbar from "../../components/Navbar/Navbar";
 import Hero from "../../components/Hero/Hero";
+import About from "../../components/About/About";
 import Contact from "../../components/Contact/Contact";
 import Footer from "../../components/Footer/Footer";
 
@@ -11,8 +12,9 @@ function home() {
     <div className={styles.container}>
       <Navbar />
       <Hero />
-      {/* <Contact /> */}
-      {/* <Footer /> */}
+      <About />
+      <Contact />
+      <Footer />
     </div>
   );
 }

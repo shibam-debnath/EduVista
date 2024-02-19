@@ -4,7 +4,7 @@ import Presentation from './pages/presentation/presentation';
 import Home from './pages/home/home'
 import Upload from './pages/upload/Upload';
 import Generate from './pages/generate/Generate';
-import PptxViewer from './pages/PptxViewer/PptxViewer';
+import PptxViewer from './pages/PptxViewer/PresentationViewer';
 import './App.css'
 
 function App() {
