@@ -1,10 +1,11 @@
+import axios from "axios";
 import Rescrollact, { useEffect, useState } from "react";
 import { Link, animateScroll as scroll } from "react-scroll";
 import { useLocation } from "react-router-dom";
-
+import {useNavigate} from "react-router-dom";
 import styles from './Navbar.module.scss'
 
-const Navbar = () => {
+const Navbar = (props) => {
 
   const [navbar, setNavbar] = useState(false);
   const user = true;
@@ -15,12 +16,48 @@ const Navbar = () => {
   const clickButton = () => {
     document.getElementById("contactUs").click();
   };
+
   useEffect(() => {
     if (help) {
       clickButton();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+
+  const navigate = useNavigate();
+
+     
+  function handle_logout() {
+
+    console.log("called logout")
+    const token = localStorage.getItem('token');
+    console.log(token)
+
+      axios({
+          method: "POST",
+          url:"http://127.0.0.1:5000/logout",
+      })
+      .then((response) => {
+          props.token()
+          console.log('logout successfull')
+          localStorage.removeItem('email')
+          localStorage.removeItem('token')
+
+          navigate("/login");
+      }).catch((error) => {
+          if (error.response) {
+              console.log(error.response)
+              console.log(error.response.status)
+              console.log(error.response.headers)
+          }
+      })
+  }
+
+
+
+
+
   return (
     <nav className={styles.navbar_container}>
       <div className={styles.navbar_container2}>
@@ -92,16 +129,14 @@ const Navbar = () => {
               <li>
                 <a href="/team">Our Team</a>
               </li>
-              {!user && (
-                <li>
-                  <a
-                    href="/login"
-                    className={styles.loginButton}
+              <li>
+                  <button
+                    className={styles.button}
+                    onClick={handle_logout}
                   >
-                    LogIn
-                  </a>
+                    logout
+                  </button>
                 </li>
-              )}
             </ul>
           </div>
         </div>

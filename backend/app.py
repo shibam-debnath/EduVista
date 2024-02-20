@@ -1,25 +1,98 @@
 import os
 import io
 import base64
-import google.generativeai as genai
-from io import BytesIO
 from gtts import gTTS
-from dotenv import load_dotenv
+from io import BytesIO
 from pptx import Presentation
-from flask import Flask, request, jsonify, send_file, request, make_response
-from flask_cors import CORS, cross_origin
-from pptx.slide import Slide
+from dotenv import load_dotenv
+import google.generativeai as genai
 
-load_dotenv()
-# GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-GOOGLE_API_KEY = "AIzaSyAa7UYKqvP_17wdthjVwgz4RPbJIRnro8M"
+from flask_bcrypt import Bcrypt
+from flask_cors import CORS, cross_origin
+from flask import Flask, request, jsonify, send_file, request, make_response
+from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, unset_jwt_cookies, jwt_required, JWTManager
+
+from models import db, User
 
 # Create a Flask app
 app = Flask(__name__)
 CORS(app)
+load_dotenv()
 
+app.config['SECRET_KEY'] = 'h4saki-secret-key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flaskdb.db'
+
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_ECHO = True
+
+
+jwt = JWTManager(app)
+bcrypt = Bcrypt(app)   
+db.init_app(app) 
+
+with app.app_context():
+    db.create_all()
+
+
+
+GOOGLE_API_KEY = "AIzaSyAa7UYKqvP_17wdthjVwgz4RPbJIRnro8M"
 genai.configure(api_key = GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-pro')
+
+
+
+
+
+@app.route('/logintoken', methods=["POST"])
+def create_token():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    user = User.query.filter_by(email=email).first()
+
+    if user is None:
+        return jsonify({"error": "Wrong email or passwords"}), 401
+    
+    # compare passwords
+    if not bcrypt.check_password_hash(user.password, password):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    access_token = create_access_token(identity=email)
+    return jsonify({
+        "email": email,
+        "access_token": access_token
+    })
+
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    response = jsonify({"msg": "logout successful"})
+    unset_jwt_cookies(response)
+    return response
+
+
+
+@app.route('/signup', methods=["POST"])
+def signup():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    user_exists = User.query.filter_by(email=email).first() is not None
+   
+    if user_exists:
+        return jsonify({"error": "Email already exists"}), 409
+    
+    hashed_password = bcrypt.generate_password_hash(password)
+    new_user = User(name="Shibam Debnath", email=email, password=hashed_password, about="sample about me")
+    db.session.add(new_user)
+    db.session.commit()
+   
+    return jsonify({
+        "id": new_user.id,
+        "email": new_user.email,
+    })
+
 
 @app.route("/")
 @cross_origin(supports_credentials=True)
