@@ -1,7 +1,9 @@
 .video_section {
+
     margin-top: 60px;
     width: 100%; /* Use 100% width to fit the container */
     max-width: 800px; /* Set a maximum width if needed */
+    
     
     .video_container{
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Add a subtle shadow */
@@ -26,6 +28,13 @@
         &:hover {
             background-color: #0056b3; // Change background color on hover
         }
+    }
+
+
+    .button_section{
+        display: flex;
+        align-items: center;
+        flex-direction: column;
     }
 }
 

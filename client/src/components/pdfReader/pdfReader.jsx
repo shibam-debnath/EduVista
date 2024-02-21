@@ -3,7 +3,7 @@ import controlPanel from '../controlPanel/controlPanel';
 import styles from './pdfReader.module.scss'
 
 const pdfReader = () => {
-    const ppt_path = "/assets/sample.pdf";
+    const ppt_path = "/assets/sample2.pdf";
     return (
         <div>
             <div className={styles.viewer_container}>
