@@ -5,19 +5,19 @@
 .navbar_container {
   width: 100%;
   background-color: transparent;
-  position: fixed;
   height: 4rem;
   top: 0;
+  padding: 0px 20px;
 
   .navbar_container2 {
     display: flex;
     justify-content: space-between;
     margin: 0 auto;
-    max-width: 90rem; /* lg:max-w-8xl */
+    max-width: 90rem; 
 
     @media (min-width: 768px) {
-      flex-direction: row; /* md:flex */
-      align-items: center; /* md:items-center */
+      flex-direction: row; 
+      align-items: center; 
     }
 
     .navbar {

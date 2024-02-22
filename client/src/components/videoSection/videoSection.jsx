@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import YouTube from 'react-youtube';
 import axios from 'axios';
 import styles from './videoSection.module.scss';
+import ReactViewer from 'react-viewer';
 import PDFReader from "../../components/pdfReader/pdfReader";
 
-const VideoSection = ({ headings, contents, all_slide_contents, avatar }) => {
+const VideoSection = ({ headings, contents, all_slide_contents, avatar, file}) => {
   
   const videoId = 'NzZXz3fJf6o';
   const [player, setPlayer] = useState(null);
@@ -13,6 +13,23 @@ const VideoSection = ({ headings, contents, all_slide_contents, avatar }) => {
   const [loading, setLoading] = useState(false);
   const audioRef = useRef(new Audio());
 
+  const viewerRef = useRef(null);
+
+  const [currentFile, setCurrentFile] = useState(file); // Initial file from props
+
+  useEffect(() => {
+
+    console.log("fileeeee")
+    if(file){
+      console.log('File hain')
+    }
+    setCurrentFile(file); // Update state when props change
+  }, [file]);
+
+
+  console.log("model")
+  console.log(avatar)
+  console.log(file)
 
   // function that gets the audio from backend
   const handleGenerateAudio = async () => {
@@ -56,31 +73,19 @@ const VideoSection = ({ headings, contents, all_slide_contents, avatar }) => {
 
   const toggleVideo = () => {
 
-    //* Youtube video play pause
-    // if (player) {
-    //   if (isPlaying) {
-    //     player.pauseVideo();
-    //     audioRef.current.pause(); // Pause the audio when the video is paused
-    //   } else {
-    //     player.playVideo();
-    //     audioRef.current.play(); // Start playing the audio when the video starts
-    //   }
-    //   setIsPlaying(!isPlaying);
-    // }
-
-
     //* MP4 video play pause 
     const teacherVideo = document.getElementById('teacherVideo');
     if (teacherVideo) {
       if (teacherVideo.paused) {
         teacherVideo.play();
+        setIsPlaying(true);
         audioRef.current.play(); // Start playing the audio when the video starts
       } else {
         teacherVideo.pause();
         audioRef.current.pause(); // Pause the audio when the video is paused
+        setIsPlaying(false);
       }
     }
-  
   };
 
   const handleVideoEnded = () => {
@@ -105,7 +110,6 @@ const VideoSection = ({ headings, contents, all_slide_contents, avatar }) => {
     <div className={styles.video_section}>
       <div className={styles.presentation}>
         <div className={styles.video_container}>
-          {/* <YouTube videoId={videoId} onReady={onReady} /> */}
           <video 
             controls 
             src="/assets/AIteacher.mp4" 
@@ -119,35 +123,53 @@ const VideoSection = ({ headings, contents, all_slide_contents, avatar }) => {
           </video>
         </div>
         <div>
+          <ReactViewer
+            fileType={['ppt', 'pptx']}
+            useZoom={true}
+            useThumbnails={true}
+            showToolbar={true}
+            showDownloadButton={true}
+            file={currentFile} // Pass state value as file
+          />
           <PDFReader/>
         </div>
       </div>
 
-      <button className={styles.button} disabled={loading} onClick={toggleVideo}>
-        {isPlaying ? 'Pause Presentation' : 'Start Presentation'}
-      </button>
-      
-      {
-      !audioData && 
-      <button onClick={handleGenerateAudio} disabled={loading || isPlaying}>
-        Generate Audio
-      </button>
-      }
-      
 
-      {loading && <p>Generating.....      please wait a bit !</p>}
+      <div className={styles.button_section}>
+
+        {
+            audioData && 
+          <button className={styles.button} disabled={loading} onClick={toggleVideo}>
+            {isPlaying ? 'Pause Presentation' : 'Start Presentation'}
+          </button>
+
+        }
+          
+          {
+          !audioData && 
+          <button className={styles.button} onClick={handleGenerateAudio} disabled={loading || isPlaying}>
+            Generate Audio
+          </button>
+          }
+          
+
+          {loading && <p>Generating.....      please wait a bit !</p>}
+          
+          {audioData && (
+            <div>
+              <div className={styles.button_section}>
+                <h2>Generated Audio</h2>
+                <audio ref={audioRef} controls>
+                  <source src={audioData} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            </div>
+          )}
+      </div>
+
       
-      {audioData && (
-        <div>
-          <div>
-            <h2>Generated Audio</h2>
-            <audio ref={audioRef} controls>
-              <source src={audioData} type="audio/mpeg" />
-              Your browser does not support the audio element.
-            </audio>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

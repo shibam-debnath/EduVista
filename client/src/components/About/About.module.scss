@@ -1,0 +1,28 @@
+.container {
+    padding: 5% 13%;
+}
+
+.faqSection {
+    margin-bottom: 20px;
+    background-color: #313131;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.question {
+    color: #bcbcbc;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+}
+
+.answer {
+    color: #8e8e8e;
+    font-size: 16px;
+}
+
+.arrow {
+    cursor: pointer;
+    transform: rotate(180deg);
+}

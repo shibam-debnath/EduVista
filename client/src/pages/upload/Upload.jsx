@@ -13,15 +13,14 @@ const Upload = () => {
   const [all_slide_contents, setAllSlideContents] = useState("");
   const navigateTo = useNavigate();
 
-  const modelOptions = ['model 1', 'model 2', 'model 3'];
+  const modelOptions = ['model 1', 'model 2'];
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
   };
 
-
-
+  
   const handleModelChange = (event) => {
     setModel(event.target.value);
   };
@@ -42,17 +41,33 @@ const Upload = () => {
     
     try {
 
-      const response = await fetch('http://localhost:5000/upload', {
+
+      var MODEL_ENDPOINT = 'http://localhost:5000/upload';
+      if(model == 'model 1'){
+          MODEL_ENDPOINT = 'http://localhost:5000/api/generate_content';
+      }
+      else if(model == 'model 2'){
+          MODEL_ENDPOINT = 'http://localhost:5000/api/generate_content_gemini';
+      }
+
+
+      console.log("Model ye hein")
+      console.log(MODEL_ENDPOINT)
+
+
+      const response = await fetch( MODEL_ENDPOINT , {
         method: 'POST',
         body: formData,
       });
+
       
       // Optionally, you can handle the server's response here
       const result = await response.json();
       
       console.log('Form submitted successfully to the server! and redirecting to presentation');
-      alert("Form submitted successfully to the server! and redirecting to presentation");
-
+      console.log(result)
+      // alert("Form submitted successfully to the server! and redirecting to presentation");
+      
       // Check if the response contains headings and contents
       if (result.headings && result.contents && result.all_slide_contents) {
         navigateTo('/presentation', {
@@ -61,6 +76,7 @@ const Upload = () => {
             contents: result.contents,
             all_slide_contents: result.all_slide_contents,
             model: model,
+            file:file
           }
         });
       }
@@ -71,6 +87,7 @@ const Upload = () => {
   };
 
   return (
+    <div className={styles.section}>
       <div className={styles.form_style}>
           <h1 >Upload your<span>PPT/PPTX</span></h1>
           <form onSubmit={handleFormSubmit}>
@@ -115,6 +132,7 @@ const Upload = () => {
             </div>
           )}
       </div>
+    </div>
   );
 }
 

@@ -1,37 +1,34 @@
 /* ButtonStyles.css */
 .hero {
-    padding: 1rem;
+
+    margin-top: 10%;
     display: flex;
-    justify-content: space-around // flex-direction: column;
-}
+    justify-content: space-around; // flex-direction: column;
 
-.heroImage {
-    /* Your image styles */
-    width: 90%;
-    /* Ensures the image doesn't exceed its container */
-}
+    .heroDiv {
+        min-width: 20rem;
+    }
 
-.heroTextDiv {
-    width: 50%;
-}
+    .heroImage {
+        /* Your image styles */
+        width: fit-content;
+        /* Ensures the image doesn't exceed its container */
+    }
 
-.heroDiv {
-    /* Your image styles */
-    width: 40%;
-    /* Ensures the image doesn't exceed its container */
+    .textPrimary{
+        color: #6b60f1;
+    }
+
 }
 
 
 .A {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    padding: 3rem 1.5rem;
     text-align: center;
     color: #ffffff;
 
 
-    @media (min-width: 768px) {
+    @media (min-width: 768px) and   (max-width: 1024px) {
         padding-left: 3rem;
         padding-right: 3rem;
     }
@@ -56,14 +53,14 @@
     }
 
     .button1 {
-        background: #4B99AD;
+        background: #6b60f1;
         padding: 8px 15px 8px 15px;
         border: none;
         color: #fff;
     }
 
     .button1:hover {
-        background: #4691A4;
+        background: #0a102d;
         box-shadow: none;
         -moz-box-shadow: none;
         -webkit-box-shadow: none;

@@ -1,18 +1,29 @@
 .viewerContainer{
-    padding: 0rem;
+    padding: 5rem 0rem;
+
+    .container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .header{
+            margin: 0px 10%;
+            line-height: normal;
+            font-size: 40px;
+            align-items: center;
+            background-image: linear-gradient(to left, #553c9a, #b393d3);
+            color: transparent;
+            -webkit-background-clip: text;
+        }
+    }
+
+    .presentation{
+        display: flex;
+        align-items: center;
+        justify-content: space-evenly;
+    }
+
 }
 
-.presentation{
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-}
 
-.header{
-    margin: 0px 10%;
-    line-height: normal;
-    font-size: 40px;
-    background-image: linear-gradient(to left, #553c9a, #b393d3);
-    color: transparent;
-    -webkit-background-clip: text;
-}
+
