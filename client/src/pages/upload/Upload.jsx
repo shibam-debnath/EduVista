@@ -31,6 +31,39 @@ const Upload = () => {
     else alert('Please select a file and an model before submitting.');
   };
 
+  function savePdf(blob) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      const link = document.createElement('a');
+      link.href = reader.result;
+      link.download = 'output.pdf'; // Name for the downloaded file
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+    reader.readAsDataURL(blob);
+  }
+
+  async function fetchPdf() {
+    
+    try {
+
+      const response = await fetch('http://localhost:5000/upload' , {
+        method: 'POST',
+        body: file,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch PDF: ${response.statusText}`);
+      }
+      const blob = await response.blob();
+      savePdf(blob);
+
+    } catch (error) {
+      console.error('Error fetching PDF:', error);
+    }
+  }
+
   
   // function that uploads the ppt, stores and retreives the response from backend  
   const uploadPPT = async () => {
@@ -41,6 +74,7 @@ const Upload = () => {
     
     try {
 
+      fetchPdf()
 
       var MODEL_ENDPOINT = 'http://localhost:5000/upload';
       if(model == 'model 1'){
@@ -80,7 +114,6 @@ const Upload = () => {
           }
         });
       }
-
     } catch (error) {
       console.error('Error uploading file:', error);
     }
