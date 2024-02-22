@@ -20,8 +20,7 @@ const Upload = () => {
     setFile(selectedFile);
   };
 
-
-
+  
   const handleModelChange = (event) => {
     setModel(event.target.value);
   };
@@ -42,6 +41,7 @@ const Upload = () => {
     
     try {
 
+
       var MODEL_ENDPOINT = 'http://localhost:5000/upload';
       if(model == 'model 1'){
           MODEL_ENDPOINT = 'http://localhost:5000/api/generate_content';
@@ -59,6 +59,7 @@ const Upload = () => {
         method: 'POST',
         body: formData,
       });
+
       
       // Optionally, you can handle the server's response here
       const result = await response.json();

@@ -2,6 +2,7 @@ import os
 import io
 import base64
 from gtts import gTTS
+import comtypes.client
 from io import BytesIO
 from pptx import Presentation
 from dotenv import load_dotenv
@@ -102,7 +103,7 @@ def home():
 
 
 # Define the directory where you want to store uploaded PPTX files
-UPLOAD_FOLDER = 'static/pptx_files'
+UPLOAD_FOLDER = 'static'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # function that extracts file information from the ppt using python-pptx
@@ -136,9 +137,108 @@ def read_ppt(file_path):
 
 
 
+def convert_pptx_to_pdf(pptx_path, output_dir):
+
+    try:
+        # Ensure output directory exists
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Get filename without extension
+        filename = os.path.splitext(os.path.basename(pptx_path))[0]
+        output_file_path = os.path.join(output_dir, f"{filename}.pdf")
+        return output_file_path
+
+
+
+        print(output_file_path)
+
+        # Create PowerPoint application object
+        powerpoint = comtypes.client.CreateObject("Powerpoint.Application")
+
+
+        # Minimize PowerPoint window (optional)
+        powerpoint.Visible = 0  # Set to 1 to make it visible
+
+        # Open the PPTX file
+        slides = powerpoint.Presentations.Open(pptx_path)
+
+        # Save as PDF
+        slides.SaveAs(output_file_path, 32)  # formatType = 32 for PDF
+
+        # Close PowerPoint objects
+        slides.Close()
+        powerpoint.Quit()
+
+        return output_file_path
+
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"PPTX file not found: {pptx_path}") from e
+    except OSError as e:
+        raise OSError(f"Error saving PDF file: {output_file_path}") from e
+
+
+
 @app.route('/upload', methods=['POST', "OPTIONS"])
 def upload_file():
-    pass
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+    
+    if request.method == "POST":
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'})
+
+        file = request.files['file']
+        avatar = request.form.get('avatar')
+
+        if file and file.filename.endswith('.pptx'):
+            
+            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+            base_file_path = os.path.join(app.config['UPLOAD_FOLDER'])
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], "slides.pptx")
+            file.save(file_path)
+
+
+            # Initialize COM library
+            comtypes.CoInitialize()
+
+            # Get console arguments
+            input_file_path = "static/slides.pptx"
+            output_file_path = "static/output.pdf"
+
+            # Convert file paths to Windows format
+            input_file_path = os.path.abspath(input_file_path)
+            output_file_path = os.path.abspath(output_file_path)
+
+            # Create PowerPoint application object
+            powerpoint = comtypes.client.CreateObject("Powerpoint.Application")
+
+            # Set visibility to minimize
+            powerpoint.Visible = 1
+
+            # Open the PowerPoint slides
+            slides = powerpoint.Presentations.Open(input_file_path)
+
+            # Save as PDF (formatType = 32)
+            slides.SaveAs(output_file_path, 32)
+
+            # Close the slide deck
+            slides.Close()
+
+            pdf_path ="static/output.pdf"
+            return send_file(pdf_path, as_attachment=True)
+
+        else: 
+            return jsonify({'error': 'Invalid file'})
+    else:
+        raise RuntimeError("Weird - don't know how to handle method {}".format(request.method))
+
+
+
+
+
+
+
 
 
 # API 0 : model 0 ( base model ) : reads the ppt 
@@ -262,3 +362,4 @@ def _build_cors_preflight_response():
 # main 
 if __name__ == "__main__":
     app.run(debug=True)
+
