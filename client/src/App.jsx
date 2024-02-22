@@ -9,6 +9,7 @@ import './App.css'
 import Login from './pages/login/Login';
 import useToken from './auth/useToken';
 import Navbar from './components/Navbar/Navbar';
+import Signup from './pages/signup/Signup';
 
 function App() {
 
@@ -21,7 +22,12 @@ function App() {
   return (
     <Router>
       {!token && token!=="" &&token!== undefined?  
-        <Login setToken={setToken} />
+      <Routes>
+        <Route path="/login" element={<Login setToken={setToken} />} />
+        <Route path="/signup" element={
+          <Signup token={token} removeToken={removeToken} setToken={setToken} />} 
+        />
+      </Routes>
       :(
         <>
           <Routes>

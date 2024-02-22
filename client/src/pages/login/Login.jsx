@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-
+import styles from "./Login.module.scss";
+import { Link,useNavigate } from "react-router-dom";
 
 const Login = (props) => {
 
     const navigate = useNavigate();
+    const [error, setError] = useState("");
 
     const [loginForm, setloginForm] = useState({
         email: "",
@@ -17,6 +18,11 @@ const Login = (props) => {
     setloginForm(prevNote => ({
         ...prevNote, [name]: value})
     )}
+
+
+    const handlesubmit = ()=>{
+      navigate('/signup');
+    }
 
 
     function btnlogin(event) {
@@ -59,8 +65,53 @@ const Login = (props) => {
     }
 
   return (
-    <div>
-        <div className="container h-50">
+      <div>
+        <div className={styles.login_container}>
+          <div className={styles.login_form_container}>
+            <div className={styles.left}>
+              <form className={styles.form_container} onSubmit={btnlogin}>
+                <h1>Login to Your Account</h1>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  onChange={handleChange}
+                  text={loginForm.email}
+                  value={loginForm.email}
+                  required
+                  className={styles.input}
+                />
+
+                <input
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  onChange={handleChange}
+                  text={loginForm.password}
+                  value={loginForm.password}
+                  required
+                  className={styles.input}
+                />
+
+                {error && <div className={styles.error_msg}>{error}</div>}
+                <button type="submit" className={styles.green_btn}>
+                  Sign In
+                </button>
+              </form>
+            </div>
+            <div className={styles.right}>
+              <h1>New Here ?</h1>
+              <Link to="/signup">
+                  <button type="button" className={styles.white_btn} onClick={handlesubmit}>
+                      Sign Up
+                  </button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+  )
+        {/* <div className="container h-50">
           <div className="container-fluid h-custom">
             <div className="row d-flex justify-content-center align-items-center h-50">
               <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
@@ -92,9 +143,7 @@ const Login = (props) => {
               </div>
             </div>
           </div>
-        </div>
-    </div>
-  )
+        </div> */}
 }
 
 export default Login

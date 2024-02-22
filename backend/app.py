@@ -41,8 +41,6 @@ model = genai.GenerativeModel('gemini-pro')
 
 
 
-
-
 @app.route('/logintoken', methods=["POST"])
 def create_token():
     email = request.json.get("email", None)
@@ -63,8 +61,6 @@ def create_token():
         "access_token": access_token
     })
 
-
-
 @app.route("/logout", methods=["POST"])
 def logout():
     response = jsonify({"msg": "logout successful"})
@@ -73,25 +69,30 @@ def logout():
 
 
 
-@app.route('/signup', methods=["POST"])
+@app.route('/signup', methods=["POST", "OPTIONS"])
 def signup():
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
 
-    user_exists = User.query.filter_by(email=email).first() is not None
-   
-    if user_exists:
-        return jsonify({"error": "Email already exists"}), 409
+    if request.method == "POST":
+        name = request.json.get("name", None)
+        email = request.json.get("email", None)
+        password = request.json.get("password", None)
+
+        user_exists = User.query.filter_by(email=email).first() is not None
     
-    hashed_password = bcrypt.generate_password_hash(password)
-    new_user = User(name="Shibam Debnath", email=email, password=hashed_password, about="sample about me")
-    db.session.add(new_user)
-    db.session.commit()
-   
-    return jsonify({
-        "id": new_user.id,
-        "email": new_user.email,
-    })
+        if user_exists:
+            return jsonify({"error": "Email already exists"}), 409
+        
+        hashed_password = bcrypt.generate_password_hash(password)
+        new_user = User(name=name, email=email, password=hashed_password, about="sample about me")
+        db.session.add(new_user)
+        db.session.commit()
+    
+        return jsonify({
+            "id": new_user.id,
+            "email": new_user.email,
+        })
 
 
 @app.route("/")

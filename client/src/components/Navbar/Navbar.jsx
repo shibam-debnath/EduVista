@@ -55,9 +55,6 @@ const Navbar = (props) => {
   }
 
 
-
-
-
   return (
     <nav className={styles.navbar_container}>
       <div className={styles.navbar_container2}>
