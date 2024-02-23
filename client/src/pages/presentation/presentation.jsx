@@ -14,11 +14,11 @@ const presentation = () =>{
   const file = stateData.file;
   const headings = stateData.headings;
   const all_slide_contents = stateData.all_slide_contents;
+  const pdfUrl = stateData.pdfUrl;
   
   // Access state data
-  console.log("content ye hein");
+  console.log("printing props data inside /presentation route");
   console.log(stateData.all_slide_contents);
-  console.log("done")
 
   return (
     <div className={styles.viewerContainer}>
@@ -30,7 +30,8 @@ const presentation = () =>{
           headings={headings} 
           contents={stateData.contents} 
           all_slide_contents={all_slide_contents} 
-          avatar={model} 
+          avatar={model}
+          pdfUrl={pdfUrl} 
         />
       </div>  
     </div>

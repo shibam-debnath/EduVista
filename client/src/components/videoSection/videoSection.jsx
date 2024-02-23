@@ -4,7 +4,7 @@ import styles from './videoSection.module.scss';
 import ReactViewer from 'react-viewer';
 import PDFReader from "../../components/pdfReader/pdfReader";
 
-const VideoSection = ({ headings, contents, all_slide_contents, avatar, file}) => {
+const VideoSection = ({ headings, contents, all_slide_contents, avatar, file, pdfUrl}) => {
   
   const videoId = 'NzZXz3fJf6o';
   const [player, setPlayer] = useState(null);
@@ -131,7 +131,9 @@ const VideoSection = ({ headings, contents, all_slide_contents, avatar, file}) =
             showDownloadButton={true}
             file={currentFile} // Pass state value as file
           />
-          <PDFReader/>
+          <PDFReader
+            pdfUrl={pdfUrl}
+          />
         </div>
       </div>
 

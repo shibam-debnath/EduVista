@@ -11,6 +11,9 @@ const Upload = () => {
   const [headings, setHeadings] = useState({});
   const [contents, setContents] = useState({});
   const [all_slide_contents, setAllSlideContents] = useState("");
+  const [pdfUrl, setPdfUrl] = useState('');
+
+
   const navigateTo = useNavigate();
 
   const modelOptions = ['model 1', 'model 2'];
@@ -31,40 +34,7 @@ const Upload = () => {
     else alert('Please select a file and an model before submitting.');
   };
 
-  function savePdf(blob) {
-    const reader = new FileReader();
-    reader.onload = function () {
-      const link = document.createElement('a');
-      link.href = reader.result;
-      link.download = 'output.pdf'; // Name for the downloaded file
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
-    reader.readAsDataURL(blob);
-  }
 
-  async function fetchPdf() {
-    
-    try {
-
-      const response = await fetch('http://localhost:5000/upload' , {
-        method: 'POST',
-        body: file,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch PDF: ${response.statusText}`);
-      }
-      const blob = await response.blob();
-      savePdf(blob);
-
-    } catch (error) {
-      console.error('Error fetching PDF:', error);
-    }
-  }
-
-  
   // function that uploads the ppt, stores and retreives the response from backend  
   const uploadPPT = async () => {
     
@@ -74,49 +44,67 @@ const Upload = () => {
     
     try {
 
-      fetchPdf()
-
+      
+      // POST request to convert the pptx file to pdf 
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response2 = await axios.post('http://localhost:5000/upload', formData, {
+        responseType: 'blob' // Force to receive data in a Blob Format
+      });
+      
+      // Create a Blob from the PDF Stream
+      const pdfBlob = new Blob([response2.data], { type: 'application/pdf' });
+      
+      // Build a URL from the blob
+      const pdf_file_url = URL.createObjectURL(pdfBlob);
+      
+      console.log("PDF url")
+      console.log(pdf_file_url)
+      setPdfUrl(pdf_file_url);
+      
+      
       var MODEL_ENDPOINT = 'http://localhost:5000/upload';
-      if(model == 'model 1'){
-          MODEL_ENDPOINT = 'http://localhost:5000/api/generate_content';
-      }
-      else if(model == 'model 2'){
-          MODEL_ENDPOINT = 'http://localhost:5000/api/generate_content_gemini';
-      }
-
-
-      console.log("Model ye hein")
-      console.log(MODEL_ENDPOINT)
-
+      // POST request to the selected model to generate content
+      if(model == 'model 1') MODEL_ENDPOINT = 'http://localhost:5000/api/generate_content';
+      else if(model == 'model 2') MODEL_ENDPOINT = 'http://localhost:5000/api/generate_content_gemini';
 
       const response = await fetch( MODEL_ENDPOINT , {
         method: 'POST',
         body: formData,
       });
-
       
-      // Optionally, you can handle the server's response here
-      const result = await response.json();
-      
+      const result = await response.json();      
       console.log('Form submitted successfully to the server! and redirecting to presentation');
       console.log(result)
-      // alert("Form submitted successfully to the server! and redirecting to presentation");
+
+
+
+
       
       // Check if the response contains headings and contents
-      if (result.headings && result.contents && result.all_slide_contents) {
+      if (result.headings && result.contents && result.all_slide_contents && pdf_file_url) {
         navigateTo('/presentation', {
           state : {
             headings: result.headings,
             contents: result.contents,
             all_slide_contents: result.all_slide_contents,
             model: model,
-            file:file
+            file:file,
+            pdfUrl:pdf_file_url
           }
         });
       }
+
+
+
+
     } catch (error) {
       console.error('Error uploading file:', error);
     }
+
+
+
   };
 
   return (
@@ -153,6 +141,7 @@ const Upload = () => {
               </ul>
             </div>
           )}
+
           {Object.keys(contents).length > 0 && (
             <div>
               <h2>Extracted Contents</h2>
@@ -164,6 +153,7 @@ const Upload = () => {
               <button onClick={handleGenerateAudio}>Generate Audio</button>
             </div>
           )}
+
       </div>
     </div>
   );
