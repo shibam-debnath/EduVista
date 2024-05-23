@@ -26,3 +26,8 @@ instance/
 # Ignore files generated during testing
 .coverage
 htmlcov/
+
+#ignore models
+wav2lip_gan.pth
+s3fd-619a316812.pth
+s3fd.pth

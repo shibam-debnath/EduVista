@@ -49,7 +49,7 @@ const Upload = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response2 = await axios.post('http://localhost:5000/upload', formData, {
+      const response2 = await axios.post('http://127.0.0.1:5000/upload', formData, {
         responseType: 'blob' // Force to receive data in a Blob Format
       });
       
@@ -64,10 +64,10 @@ const Upload = () => {
       setPdfUrl(pdf_file_url);
       
       
-      var MODEL_ENDPOINT = 'http://localhost:5000/upload';
+      var MODEL_ENDPOINT = 'http://127.0.0.1:5000/upload';
       // POST request to the selected model to generate content
-      if(model == 'model 1') MODEL_ENDPOINT = 'http://localhost:5000/api/generate_content';
-      else if(model == 'model 2') MODEL_ENDPOINT = 'http://localhost:5000/api/generate_content_gemini';
+      if(model == 'model 1') MODEL_ENDPOINT = 'http://127.0.0.1:5000/api/generate_content';
+      else if(model == 'model 2') MODEL_ENDPOINT = 'http://127.0.0.1:5000/api/generate_content_gemini';
 
       const response = await fetch( MODEL_ENDPOINT , {
         method: 'POST',

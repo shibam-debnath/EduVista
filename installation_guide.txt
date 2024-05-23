@@ -1,0 +1,74 @@
+Prerequisites :
+
+    1. Node.js installed on your system [ NODE.js 18.17.1 ]
+    2. Python installed on your system  [ Python 3.11.1 : IMPORTANT ]
+
+
+Installation steps :
+
+    1. Setup Frontend:
+        cd frontend
+
+    1.1. Install dependencies:
+        npm install
+
+    1.2. Run the development server:
+        npm run dev
+
+    Your React app should now be running at http://localhost:5173
+    
+    2. Setup Backend:
+        cd ../backend
+
+
+    2.1 Create a virtual environment (optional but recommended):
+        python -m venv venv
+
+    2.2 Activate the virtual environment:
+        On Windows:
+            venv\Scripts\activate
+        On macOS and Linux:
+            source venv/bin/activate
+
+    2.3 Install Flask and other dependencies:
+        pip install -r requirements.txt
+        pip install -r requirements2.txt
+
+    2.4 Set up environment variables (if required) in a .env file.
+
+    2.5 NOTE : we are using Wav2Lip model implementation from here : [ https://github.com/Rudrabha/Wav2Lip ]
+        Please see the README file of this project if you are integrating the model for the first time. 
+
+    2.6 Run the Flask development server:
+        python app.py
+
+    2.7 Special Mentions 
+        - We are using Gemini pro API key in he backend which should be available for your use. If it is not available please create one API key for Gemini pro. 
+        - We have exposed the API Key to everyone but, you should store them in a environment variable which pushing it to anywhere.
+        - Please use appropriate versions of modules which we have listed in the requirements.txt and requirements2.txt
+        - To not face any version issue, please use the same python version as mentioned above which is Python 3.11.1
+        - For Wav2Lip setup, please go through the readme file of wav2Lip which is available in this github repository [ https://github.com/Rudrabha/Wav2Lip ].
+
+    Your Flask backend should now be running at http://localhost:5000
+
+
+Accessing the project from same network 
+
+    - To access the project running on the host device within the same network, follow these instructions:
+
+    1. Backend Server:
+        1.1 Open a web browser on your device connected to the same network.
+        1.2 Enter the following URL in the address bar: http://{host-ip-address}:5000
+        1.3 Replace {host-ip-address} with the actual IP address of the host device where the backend server is running. For example, http://192.168.133.17:5000
+        1.4 Press Enter to navigate to the specified URL.
+
+    - You should now be able to access the backend server of the project.
+
+
+    2. Frontend Server:
+        2.1 open a web browser on your device connected to the same network.
+        2.2 Enter the following URL in the address bar: http://{host-ip-address}:5173
+        2.3 Replace {host-ip-address} with the actual IP address of the host device where the frontend server is running. For example, http://192.168.133.17:5173
+        2.4 Press Enter to navigate to the specified URL.
+
+    - You should now be able to access the frontend server of the project.

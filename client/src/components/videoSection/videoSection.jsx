@@ -6,30 +6,15 @@ import PDFReader from "../../components/pdfReader/pdfReader";
 
 const VideoSection = ({ headings, contents, all_slide_contents, avatar, file, pdfUrl}) => {
   
-  const videoId = 'NzZXz3fJf6o';
   const [player, setPlayer] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioData, setAudioData] = useState(null);
+  const [VideoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const audioRef = useRef(new Audio());
 
-  const viewerRef = useRef(null);
-
-  const [currentFile, setCurrentFile] = useState(file); // Initial file from props
-
-  useEffect(() => {
-
-    console.log("fileeeee")
-    if(file){
-      console.log('File hain')
-    }
-    setCurrentFile(file); // Update state when props change
-  }, [file]);
 
 
-  console.log("model")
-  console.log(avatar)
-  console.log(file)
 
   // function that gets the audio from backend
   const handleGenerateAudio = async () => {
@@ -66,6 +51,35 @@ const VideoSection = ({ headings, contents, all_slide_contents, avatar, file, pd
   };
 
 
+  // function that gets the audio from backend
+  const handleGenerateVideo = async () => {
+    
+    console.log("Post request to generate video");
+    try {
+      
+      setLoading(true);
+      console.log("inside try function")
+      fetch('http://127.0.0.1:5000/api/generate_video')
+      .then(response => response.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        console.log("URL is")
+        console.log(url)
+        console.log("Blob is")
+        console.log(blob)
+        setVideoUrl(url);
+      })
+      .catch(error => console.error('Error fetching video:', error));
+      console.log("end of try function")
+      setLoading(false);
+
+    } catch (error) {
+      console.error('Error:', error);
+      setLoading(false);
+    }
+  };
+
+
 
   const onReady = (event) => {
     setPlayer(event.target);
@@ -79,10 +93,10 @@ const VideoSection = ({ headings, contents, all_slide_contents, avatar, file, pd
       if (teacherVideo.paused) {
         teacherVideo.play();
         setIsPlaying(true);
-        audioRef.current.play(); // Start playing the audio when the video starts
+        // audioRef.current.play(); // Start playing the audio when the video starts
       } else {
         teacherVideo.pause();
-        audioRef.current.pause(); // Pause the audio when the video is paused
+        // audioRef.current.pause(); // Pause the audio when the video is paused
         setIsPlaying(false);
       }
     }
@@ -110,27 +124,43 @@ const VideoSection = ({ headings, contents, all_slide_contents, avatar, file, pd
     <div className={styles.video_section}>
       <div className={styles.presentation}>
         <div className={styles.video_container}>
-          <video 
-            controls 
-            src="/assets/AIteacher.mp4" 
-            width="640px" 
-            height="360px"
-            type="video/mp4"
-            id="teacherVideo"
-            onEnded={handleVideoEnded}
-          >
-            Your browser does not support the video tag.
-          </video>
+          {
+            
+            
+            VideoUrl ? 
+            (
+              // If videoUrl accessed after fetching from backend show this one 
+              <video 
+                controls 
+                src={VideoUrl} 
+                width="640px" 
+                height="360px"
+                type="video/mp4"
+                id="teacherVideo"
+                onEnded={handleVideoEnded}
+              >
+                Your browser does not support the video tag.
+              </video>
+            
+            ):(
+
+              // else show the static one
+              <video 
+                controls 
+                src="/assets/AIteacher.mp4" 
+                width="640px" 
+                height="360px"
+                type="video/mp4"
+                id="teacherVideo"
+                onEnded={handleVideoEnded}
+              >
+                Your browser does not support the video tag.
+              </video>
+            )
+          }
         </div>
+
         <div>
-          <ReactViewer
-            fileType={['ppt', 'pptx']}
-            useZoom={true}
-            useThumbnails={true}
-            showToolbar={true}
-            showDownloadButton={true}
-            file={currentFile} // Pass state value as file
-          />
           <PDFReader
             pdfUrl={pdfUrl}
           />
@@ -141,37 +171,46 @@ const VideoSection = ({ headings, contents, all_slide_contents, avatar, file, pd
       <div className={styles.button_section}>
 
         {
-            audioData && 
-          <button className={styles.button} disabled={loading} onClick={toggleVideo}>
-            {isPlaying ? 'Pause Presentation' : 'Start Presentation'}
-          </button>
-
-        }
-          
-          {
-          !audioData && 
+          !audioData &&
           <button className={styles.button} onClick={handleGenerateAudio} disabled={loading || isPlaying}>
             Generate Audio
           </button>
-          }
-          
+        }
 
-          {loading && <p>Generating.....      please wait a bit !</p>}
+        
+        {
+          // when audio is ready and we don't have the video show this button 
+          audioData && !VideoUrl &&
+          <button className={styles.button} onClick={handleGenerateVideo} disabled={loading || isPlaying}>
+            Generate Video
+          </button>
+        }
           
-          {audioData && (
-            <div>
-              <div className={styles.button_section}>
-                <h2>Generated Audio</h2>
-                <audio ref={audioRef} controls>
-                  <source src={audioData} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
+        {
+          loading && 
+          <p>Generating.....      please wait a bit !</p>
+        }
+        
+        {
+          audioData && VideoUrl &&
+          <button className={styles.button} disabled={loading} onClick={toggleVideo}>
+            {isPlaying ? 'Pause Presentation' : 'Start Presentation'}
+          </button>
+        }
+
+        {audioData && (
+          <div>
+            <div className={styles.button_section}>
+              <h2>This is the Generated Audio</h2>
+              <audio ref={audioRef} controls>
+                <source src={audioData} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
             </div>
-          )}
-      </div>
+          </div>
+        )}
 
-      
+      </div>
     </div>
   );
 };

@@ -1,26 +1,33 @@
 import os
 import io
 import base64
+import subprocess
 from gtts import gTTS
 import comtypes.client
 from io import BytesIO
 from pptx import Presentation
 from dotenv import load_dotenv
 import google.generativeai as genai
-
+from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
 from flask import Flask, request, jsonify, send_file, request, make_response
 from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, unset_jwt_cookies, jwt_required, JWTManager
+from user_models import db, User
 
-from models import db, User
+load_dotenv()
+
+
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
+
 
 # Create a Flask app
 app = Flask(__name__)
 CORS(app)
 load_dotenv()
 
-app.config['SECRET_KEY'] = 'h4saki-secret-key'
+app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///flaskdb.db'
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -36,37 +43,12 @@ with app.app_context():
 
 
 
-GOOGLE_API_KEY = "AIzaSyAa7UYKqvP_17wdthjVwgz4RPbJIRnro8M"
 genai.configure(api_key = GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-pro')
 
-
-
-@app.route('/logintoken', methods=["POST"])
-def create_token():
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
-
-    user = User.query.filter_by(email=email).first()
-
-    if user is None:
-        return jsonify({"error": "Wrong email or passwords"}), 401
-    
-    # compare passwords
-    if not bcrypt.check_password_hash(user.password, password):
-        return jsonify({"error": "Unauthorized"}), 401
-
-    access_token = create_access_token(identity=email)
-    return jsonify({
-        "email": email,
-        "access_token": access_token
-    })
-
-@app.route("/logout", methods=["POST"])
-def logout():
-    response = jsonify({"msg": "logout successful"})
-    unset_jwt_cookies(response)
-    return response
+# Define the directory where you want to store uploaded PPTX files
+UPLOAD_FOLDER = 'static'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 
@@ -96,15 +78,44 @@ def signup():
         })
 
 
+
+
+@app.route('/logintoken', methods=["POST"])
+def create_token():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    user = User.query.filter_by(email=email).first()
+
+    if user is None:
+        return jsonify({"error": "Wrong email or passwords"}), 401
+    
+    # compare passwords
+    if not bcrypt.check_password_hash(user.password, password):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    access_token = create_access_token(identity=email)
+    return jsonify({
+        "email": email,
+        "access_token": access_token
+    })
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    response = jsonify({"msg": "logout successful"})
+    unset_jwt_cookies(response)
+    return response
+
+
+
+
 @app.route("/")
 @cross_origin(supports_credentials=True)
 def home():
     return jsonify("Hello Shibam! Flask Server is running properly")
 
 
-# Define the directory where you want to store uploaded PPTX files
-UPLOAD_FOLDER = 'static'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # function that extracts file information from the ppt using python-pptx
 def read_ppt(file_path):
@@ -236,11 +247,6 @@ def upload_file():
 
 
 
-
-
-
-
-
 # API 0 : model 0 ( base model ) : reads the ppt 
 @app.route("/api/generate_content", methods=["POST", "OPTIONS"])
 def generate_content():
@@ -344,7 +350,39 @@ def generate_audio():
         # Reset file pointer to the beginning
         audio_file.seek(0)
 
+        filename = "audio.mp3"
+        with open(filename, 'wb') as f:
+            f.write(audio_file.getvalue())
+
         return send_file(audio_file, mimetype='audio/mpeg', as_attachment=True, download_name='generated_audio.mp3')
+    else:
+        raise RuntimeError("Weird - don't know how to handle method {}".format(request.method))
+
+
+
+
+# NEW Added
+@app.route('/api/generate_video', methods=["GET", "OPTIONS"])
+def run_inference():
+    if request.method == "OPTIONS":
+        return _build_cors_preflight_response()
+
+    if request.method == "GET":
+        try:
+            # Construct the command
+            command = [
+                "python", "inference.py",
+                "--checkpoint_path", "checkpoints\wav2lip_gan.pth",
+                "--face", "video.mp4",
+                "--audio", "audio.mp3"
+            ]
+
+            # Run the command
+            subprocess.run(command, check=True)
+            # Return the resulting video file
+            return send_file("results/result_voice.mp4", as_attachment=True)
+        except Exception as e:
+            return f'Error occurred: {str(e)}', 500
     else:
         raise RuntimeError("Weird - don't know how to handle method {}".format(request.method))
 
@@ -362,4 +400,23 @@ def _build_cors_preflight_response():
 # main 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# if __name__ == '__main__':
+    # app.run(host='0.0.0.0', port=5000, debug=True, threaded=False)
 

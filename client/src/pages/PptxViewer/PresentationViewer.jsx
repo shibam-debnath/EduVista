@@ -14,7 +14,7 @@ const PresentationViewer = () => {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await axios.post('http://localhost:5000/upload', formData, {
+      const response = await axios.post('http://127.0.0.1:5000/upload', formData, {
         responseType: 'blob' // Force to receive data in a Blob Format
       });
 

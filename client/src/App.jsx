@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BrowserRouter as Router,Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router,Route, Routes, Navigate } from "react-router-dom";
 import Presentation from './pages/presentation/presentation';
 import Home from './pages/home/home'
 import Upload from './pages/upload/Upload';
@@ -12,7 +12,6 @@ import Navbar from './components/Navbar/Navbar';
 import Signup from './pages/signup/Signup';
 
 function App() {
-
   const { token, removeToken, setToken } = useToken();
   
   console.log('App mein token')
@@ -27,6 +26,7 @@ function App() {
         <Route path="/signup" element={
           <Signup token={token} removeToken={removeToken} setToken={setToken} />} 
         />
+         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
       :(
         <>
