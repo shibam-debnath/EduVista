@@ -31,3 +31,7 @@ htmlcov/
 wav2lip_gan.pth
 s3fd-619a316812.pth
 s3fd.pth
+
+
+# ignore ppptx files
+static/
